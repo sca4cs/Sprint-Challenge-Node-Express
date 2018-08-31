@@ -1,5 +1,5 @@
 const db = require('../dbConfig.js');
-const mappers = require('./mappers');
+const mappers = require('../helpers/mappers');
 
 module.exports = {
   get: function(id) {
