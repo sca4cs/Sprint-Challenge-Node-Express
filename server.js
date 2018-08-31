@@ -7,6 +7,20 @@ const server = express();
 server.use(express.json());
 
 //middleware
+function checkIfProjectExists (req, res, next) {
+    const {id} = req.params;
+    projects.get(id)
+    .then(project => {
+        if (project) {
+            next();
+        }
+    })
+    .catch(err => {
+        console.error(err);
+        res.status(500).json({ error: "The project with the specified ID does not exist." });
+    });
+}
+
 function checkProjectId (req, res, next) {
     const id = req.body.project_id;
     projects.get(id)
@@ -44,6 +58,22 @@ server.get('/projects/:id', (req, res) => {
     .catch(err => {
         console.error(err);
         res.status(500).json({ error: "The project with the specified ID does not exist." });
+    });
+})
+
+server.get('/projects/:id/project-actions', checkIfProjectExists, (req, res) => {
+    const {id} = req.params;
+    projects.getProjectActions(id)
+    .then(actions => {
+        if (actions.length > 0) {
+            res.status(200).json(actions);
+        } else if (actions.length === 0) {
+            res.status(400).json({ message: "There are no actions for this project." })
+        }
+    })
+    .catch(err => {
+        console.error(err);
+        res.status(500).json({ error: "The project actions could not be retrieved." });
     });
 })
 
